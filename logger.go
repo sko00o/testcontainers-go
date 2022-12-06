@@ -46,6 +46,10 @@ func (o LoggerOption) ApplyToLocalCompose(opts *LocalDockerComposeOptions) {
 	opts.Logger = o.logger
 }
 
+func (o LoggerOption) ApplyToComposeStack(opts *ComposeStackOptions) {
+	opts.Logger = o.logger
+}
+
 type testLogger struct {
 	testing.TB
 }

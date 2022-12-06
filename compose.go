@@ -26,13 +26,14 @@ const (
 var composeLogOnce sync.Once
 var ErrNoStackConfigured = errors.New("no stack files configured")
 
-type composeStackOptions struct {
+type ComposeStackOptions struct {
 	Identifier string
 	Paths      []string
+	Logger     Logging
 }
 
 type ComposeStackOption interface {
-	applyToComposeStack(o *composeStackOptions)
+	ApplyToComposeStack(o *ComposeStackOptions)
 }
 
 type stackUpOptions struct {
@@ -99,12 +100,13 @@ func NewDockerCompose(filePaths ...string) (*dockerCompose, error) {
 }
 
 func NewDockerComposeWith(opts ...ComposeStackOption) (*dockerCompose, error) {
-	composeOptions := composeStackOptions{
+	composeOptions := ComposeStackOptions{
 		Identifier: uuid.New().String(),
+		Logger:     Logger,
 	}
 
 	for i := range opts {
-		opts[i].applyToComposeStack(&composeOptions)
+		opts[i].ApplyToComposeStack(&composeOptions)
 	}
 
 	if len(composeOptions.Paths) < 1 {
@@ -125,6 +127,7 @@ func NewDockerComposeWith(opts ...ComposeStackOption) (*dockerCompose, error) {
 	composeAPI := &dockerCompose{
 		name:           composeOptions.Identifier,
 		configs:        composeOptions.Paths,
+		logger:         composeOptions.Logger,
 		composeService: compose.NewComposeService(dockerCli),
 		dockerClient:   dockerCli.Client(),
 		waitStrategies: make(map[string]wait.Strategy),

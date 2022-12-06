@@ -81,13 +81,13 @@ func (ri RemoveImages) applyToStackDown(o *stackDownOptions) {
 
 type ComposeStackFiles []string
 
-func (f ComposeStackFiles) applyToComposeStack(o *composeStackOptions) {
+func (f ComposeStackFiles) ApplyToComposeStack(o *ComposeStackOptions) {
 	o.Paths = f
 }
 
 type StackIdentifier string
 
-func (f StackIdentifier) applyToComposeStack(o *composeStackOptions) {
+func (f StackIdentifier) ApplyToComposeStack(o *ComposeStackOptions) {
 	o.Identifier = string(f)
 }
 
@@ -112,6 +112,9 @@ type dockerCompose struct {
 
 	// paths to stack files that will be considered when compiling the final compose project
 	configs []string
+
+	// logger for containers
+	logger Logging
 
 	// wait strategies that are applied per service when starting the stack
 	// only one strategy can be added to a service, to use multiple use wait.ForAll(...)
@@ -292,6 +295,7 @@ func (d *dockerCompose) lookupContainer(ctx context.Context, svcName string) (*D
 		provider: &DockerProvider{
 			client: d.dockerClient,
 		},
+		logger: d.logger,
 	}
 
 	d.containers[svcName] = container
