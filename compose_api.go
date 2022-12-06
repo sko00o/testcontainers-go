@@ -79,6 +79,13 @@ func (ri RemoveImages) applyToStackDown(o *stackDownOptions) {
 	}
 }
 
+// RemoveVolumes will remove named volumes declared in the volumes section of the Compose file and anonymous volumes attached to containers.
+type RemoveVolumes bool
+
+func (rv RemoveVolumes) applyToStackDown(o *stackDownOptions) {
+	o.Volumes = bool(rv)
+}
+
 type ComposeStackFiles []string
 
 func (f ComposeStackFiles) ApplyToComposeStack(o *ComposeStackOptions) {
